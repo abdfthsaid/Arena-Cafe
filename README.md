@@ -4,10 +4,12 @@ Temporary single-station React/Vite frontend for testing Arena Cafe Mogadishu
 against the current Render `UsersBackend`.
 
 - Station code: `62`
-- Backend: `https://usersbackend-6yhs.onrender.com`
+- Backend: same-origin `/api/*` proxy to `https://usersbackend-6yhs.onrender.com`
 - Flow: Waafi preauthorization, HeyCharge unlock, Waafi commit/cancel
 
-Optional environment variables:
+Vercel routes `/api/*` to Render through `vercel.json`, so production browsers do not call Render directly.
+
+Optional local environment variables:
 
 ```bash
 VITE_USERS_BACKEND_URL=https://usersbackend-6yhs.onrender.com

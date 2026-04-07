@@ -5,7 +5,7 @@ import ProcessingModal from "./ProcessingModal";
 
 const BACKEND_URL =
   import.meta.env.VITE_USERS_BACKEND_URL ||
-  "https://usersbackend-6yhs.onrender.com";
+  (import.meta.env.DEV ? "https://usersbackend-6yhs.onrender.com" : "");
 const STATION_CODE = import.meta.env.VITE_STATION_CODE || "62";
 const PAYMENT_REQUEST_TIMEOUT_MS = 280_000;
 
