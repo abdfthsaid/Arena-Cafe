@@ -7,6 +7,7 @@ const BACKEND_URL =
   import.meta.env.VITE_USERS_BACKEND_URL ||
   "https://usersbackend-6yhs.onrender.com";
 const STATION_CODE = import.meta.env.VITE_STATION_CODE || "62";
+const PAYMENT_REQUEST_TIMEOUT_MS = 280_000;
 
 function getWaafiMessage(data) {
   return (
@@ -52,6 +53,7 @@ function mapBackendErrorMessage(errorMsg, waafiMsg) {
 const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
   const [showProcessing, setShowProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState("processing");
+  const [processingStep, setProcessingStep] = useState("verify");
   const [errorMessage, setErrorMessage] = useState("");
   const [reason, setReason] = useState("");
   const [batteryInfo, setBatteryInfo] = useState(null);
@@ -75,25 +77,8 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
     let isSuccess = false;
 
     try {
-      // Step 1: Check blacklist
-      setStatusMessage("Hubinaya macluumaadka..."); // Checking information
-      const blacklistCheck = await axios.get(
-        `${BACKEND_URL}/api/blacklist/check/${number}`,
-        { validateStatus: () => true },
-      );
-
-      if (blacklistCheck.data?.blacklisted) {
-        setProcessingStatus("failed");
-        setReason("BLACKLISTED");
-        setErrorMessage(
-          "Macamiil waxa kugu maqan battery hore fadlan soo celi midkaas",
-        );
-        setIsSubmitting(false); // 🛡️ Reset to allow retry
-        return;
-      }
-
-      // Step 2: Process payment
-      setStatusMessage("Hold lacagta, furaya battery-ga... Fadlan sug");
+      setProcessingStep("hold");
+      setStatusMessage("Abuuraya hold-ka lacagta...");
       const res = await axios.post(
         `${BACKEND_URL}/api/pay/${STATION_CODE}`,
         {
@@ -103,6 +88,7 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
         },
         {
           validateStatus: () => true, // Prevent axios from throwing error on 400/500
+          timeout: PAYMENT_REQUEST_TIMEOUT_MS,
         },
       );
 
@@ -110,6 +96,7 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
       const waafiMsg = getWaafiMessage(data);
 
       if (res.status === 200 && data.success === true) {
+        setProcessingStep("commit");
         setProcessingStatus("success");
         setBatteryInfo({ battery_id: data.battery_id, slot_id: data.slot_id });
         setWaafiMessage(waafiMsg || "Lacag bixinta waa guulaysatay!"); // Payment successful!
@@ -165,6 +152,7 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
       setTimeout(() => {
         setShowProcessing(false);
         setProcessingStatus("processing");
+        setProcessingStep("verify");
         setReason("");
         setErrorMessage("");
         setBatteryInfo(null);
@@ -208,6 +196,8 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
     if (Object.keys(validationErrors).length === 0) {
       setShowProcessing(true);
       setProcessingStatus("processing");
+      setProcessingStep("verify");
+      setStatusMessage("Hubinaya macluumaadka...");
       handlePayment();
     }
   };
@@ -222,6 +212,7 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
           batteryInfo={batteryInfo}
           statusMessage={statusMessage}
           waafiMessage={waafiMessage}
+          processingStep={processingStep}
           onClose={() => setShowProcessing(false)}
         />
       )}

@@ -2,6 +2,13 @@ import { useEffect } from "react";
 import { FaRegCreditCard } from "react-icons/fa";
 import { MdCheckCircle, MdError } from "react-icons/md";
 
+const PROCESSING_STEPS = [
+  { key: "verify", label: "Hubinta" },
+  { key: "hold", label: "Hold" },
+  { key: "unlock", label: "Battery" },
+  { key: "commit", label: "Commit" },
+];
+
 const ProcessingModal = ({
   status = "processing",
   errorMessage,
@@ -9,6 +16,7 @@ const ProcessingModal = ({
   batteryInfo,
   statusMessage,
   waafiMessage,
+  processingStep = "verify",
   onClose,
 }) => {
   // Auto-close for battery-related errors
@@ -77,8 +85,62 @@ const ProcessingModal = ({
       <h2 className="mb-2 text-3xl font-black tracking-tight text-slate-900">
         Lacag bixinta
       </h2>
+      <p className="mt-2 text-xl text-slate-500">EVC Plus • $0.75</p>
+      <p className="mt-3 text-sm leading-6 text-slate-500">
+        Waafi hold first, battery unlock second, commit last.
+      </p>
+
+      <div className="mt-6 flex items-start justify-between gap-2">
+        {PROCESSING_STEPS.map((step, index) => {
+          const activeStepIndex = PROCESSING_STEPS.findIndex(
+            (item) => item.key === processingStep,
+          );
+          const isActive = index === activeStepIndex;
+          const isDone = index < activeStepIndex;
+
+          return (
+            <div
+              key={step.key}
+              className="flex min-w-0 flex-1 flex-col items-center"
+            >
+              <div className="flex w-full items-center justify-center">
+                {index > 0 && (
+                  <span className="mr-2 h-[3px] w-full rounded-full bg-slate-200" />
+                )}
+
+                <span
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-lg font-semibold transition ${
+                    isActive
+                      ? "border-blue-300 bg-blue-300/80 text-white"
+                      : isDone
+                        ? "border-emerald-200 bg-emerald-100 text-emerald-700"
+                        : "border-slate-200 bg-slate-200 text-slate-400"
+                  }`}
+                >
+                  {isActive ? (
+                    <span className="inline-flex h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : isDone ? (
+                    "✓"
+                  ) : (
+                    index + 1
+                  )}
+                </span>
+
+                {index < PROCESSING_STEPS.length - 1 && (
+                  <span className="ml-2 h-[3px] w-full rounded-full bg-slate-200" />
+                )}
+              </div>
+
+              <p className="mt-3 text-lg font-medium text-slate-600">
+                {step.label}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
       {statusMessage && (
-        <p className="mb-4 rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-4 text-lg font-semibold text-blue-700">
+        <p className="mb-4 mt-8 rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-4 text-lg font-semibold text-blue-700">
           {statusMessage}
         </p>
       )}
