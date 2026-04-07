@@ -1,30 +1,29 @@
 import React from "react";
-import { BsLightningChargeFill } from "react-icons/bs";
 import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const HeaderSection = ({ darkMode, toggleDarkMode }) => (
-  <>
-    {/* Top Icons */}
-    <div className="flex items-center justify-between mb-4">
-      <div className="flex justify-center flex-1">
-        <div className="flex items-center justify-center w-16 h-16 bg-pink-100 rounded-full shadow dark:bg-gray-800">
-          <BsLightningChargeFill className="w-10 h-10 text-blue-600 dark:text-sky-300" />
-        </div>
-      </div>
-
-      <button
-        onClick={toggleDarkMode}
-        aria-label="Toggle Dark Mode"
-        className="flex items-center justify-center w-10 h-10 bg-white rounded-full shadow dark:bg-gray-800"
-      >
-        <FontAwesomeIcon
-          icon={darkMode ? faSun : faMoon}
-          className="text-purple-600 dark:text-purple-300"
-        />
-      </button>
+  <header className="mb-5 flex items-center justify-between px-1">
+    <div className="mx-auto flex flex-1 justify-center">
+      <img
+        src="/danab-logo.svg"
+        alt="Danab Powerbank Station"
+        className={`h-14 w-auto sm:h-16 ${darkMode ? "brightness-0 invert" : ""}`}
+      />
     </div>
-  </>
+
+    <button
+      onClick={toggleDarkMode}
+      aria-label="Toggle dark mode"
+      className={`flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition ${
+        darkMode
+          ? "border-white/15 bg-slate-800 text-amber-300 hover:bg-slate-700"
+          : "border-slate-200 bg-white text-purple-700 hover:bg-slate-50"
+      }`}
+    >
+      <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
+    </button>
+  </header>
 );
 
 export default HeaderSection;

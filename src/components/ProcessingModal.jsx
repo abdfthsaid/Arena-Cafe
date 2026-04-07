@@ -74,20 +74,20 @@ const ProcessingModal = ({
   // Content rendering based on status
   const renderProcessingContent = () => (
     <>
-      <h2 className="mb-2 text-xl font-semibold text-gray-800">
+      <h2 className="mb-2 text-3xl font-black tracking-tight text-slate-900">
         Lacag bixinta
       </h2>
       {statusMessage && (
-        <p className="mb-4 text-sm font-medium text-purple-600">
+        <p className="mb-4 rounded-xl border border-blue-200 bg-blue-50/80 px-4 py-4 text-lg font-semibold text-blue-700">
           {statusMessage}
         </p>
       )}
-      <p className="mb-6 text-sm text-gray-400">
+      <p className="mb-6 text-sm leading-6 text-slate-500">
         Waafi hold, battery unlock, kadib commit ayaa socda...
       </p>
       <div className="flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-purple-500 rounded-full animate-spin border-t-transparent">
-          <FaRegCreditCard className="mx-auto my-3 text-2xl text-purple-500" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-violet-500 border-t-transparent animate-spin">
+          <FaRegCreditCard className="text-2xl text-violet-500" />
         </div>
       </div>
     </>
@@ -95,11 +95,13 @@ const ProcessingModal = ({
 
   const renderSuccessContent = () => (
     <>
-      <MdCheckCircle className="mx-auto mb-3 text-5xl text-green-500" />
-      <h2 className="mb-2 text-xl font-semibold text-green-600">Guul!</h2>
+      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+        <MdCheckCircle className="text-4xl text-green-600" />
+      </div>
+      <h2 className="mb-2 text-2xl font-bold text-green-700">Guul!</h2>
       {waafiMessage && (
         <div className="p-3 mb-3 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg">
-          ✅ {waafiMessage}
+          {waafiMessage}
         </div>
       )}
       <p className="mb-2 text-sm text-gray-500">
@@ -107,7 +109,7 @@ const ProcessingModal = ({
       </p>
       {batteryInfo && (
         <p className="text-sm text-gray-600">
-          🔓 Battery <strong>{batteryInfo.battery_id}</strong> waa la furay Slot{" "}
+          Battery <strong>{batteryInfo.battery_id}</strong> waa la furay Slot{" "}
           <strong>{batteryInfo.slot_id}</strong>.
         </p>
       )}
@@ -119,10 +121,10 @@ const ProcessingModal = ({
 
     return (
       <>
-        <MdError
-          className={`mx-auto mb-3 text-5xl ${errorDisplay.iconColor}`}
-        />
-        <h2 className={`mb-2 text-xl font-semibold ${errorDisplay.titleColor}`}>
+        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+          <MdError className={`text-4xl ${errorDisplay.iconColor}`} />
+        </div>
+        <h2 className={`mb-2 text-2xl font-bold ${errorDisplay.titleColor}`}>
           {errorDisplay.title}
         </h2>
         <div
@@ -148,8 +150,8 @@ const ProcessingModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white w-[90%] max-w-sm p-6 rounded-xl shadow-lg relative text-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[radial-gradient(circle_at_top,#ede9fe,#f0ebff_35%,#f8f8ff)] px-4 py-8">
+      <div className="relative w-full max-w-sm rounded-[28px] border border-white/60 bg-white/90 p-6 text-center shadow-[0_25px_70px_rgba(94,46,140,.25)] backdrop-blur-md">
         {/* Close Button */}
         <button
           className="absolute text-xl text-gray-500 top-3 right-3 hover:text-black transition-colors"

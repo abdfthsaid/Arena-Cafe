@@ -1,5 +1,4 @@
 import React from "react";
-import { TfiTimer } from "react-icons/tfi";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -8,94 +7,65 @@ const TimeOptions = ({ selectedAmount, selectTime }) => {
 
   const times = [
     {
-      label: "1 Saac",
-      amount: "$0.50",
+      label: "$0.75",
+      amount: 0.75,
       icon: (
         <svg
-          className="w-12 h-12 mx-auto mb-2 text-blue-500"
+          className="h-5 w-5 shrink-0 text-emerald-400 sm:h-6 sm:w-6"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.8"
           viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
         >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="2"
-          />
+          <circle cx="12" cy="12" r="9" />
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M12 6v6l4 2"
-            stroke="currentColor"
-            strokeWidth="2"
+            d="M12 6.5v5l3.2 2"
           />
         </svg>
       ),
-    },
-    {
-      label: "2 Saac",
-      amount: "$1.00",
-      icon: <TfiTimer className=" w-12 h-12 mx-auto mb-2 text-blue-500" />,
     },
   ];
 
   return (
     <div>
-      <div className="px-4 py-6 text-center text-white rounded-b-[1.5rem] shadow-lg bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-400">
-        <p className="mb-2 text-xs font-semibold tracking-[0.2em] uppercase text-white/80">
-          Station #62
-        </p>
-        <h1 className="text-2xl font-black leading-tight">
-          Arena Cafe
+      <div className="mx-3 rounded-2xl bg-gradient-to-r from-violet-600 to-violet-500 px-4 py-3 text-center text-white shadow-md sm:mx-4 sm:px-5 sm:py-4">
+        <h1 className="text-base font-black leading-tight sm:text-lg">
+          Danab-Arena Cafe
           <br />
           Mogadishu
         </h1>
-        <p className="mt-2 text-sm font-medium text-white/90">
-          Dooro muddada kugu habboon
-        </p>
       </div>
 
-      <div className="flex justify-between gap-3 mt-6 ml-3 mr-3">
+      <div className="mx-auto mt-4 grid w-[200px] grid-cols-1 gap-3 sm:mt-5 sm:w-[210px] sm:gap-4">
         {times.map((time, idx) => (
-          <div
+          <button
             key={idx}
             onClick={() => selectTime(time.amount)}
-            className={`flex-1 relative text-center rounded-xl p-4 cursor-pointer shadow hover:scale-105 transition ${
+            className={`group relative flex h-[50px] items-center justify-center gap-2 overflow-hidden rounded-xl shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] sm:h-[60px] ${
               isActiveTime(time.amount)
-                ? "border-2 border-blue-500 bg-white dark:bg-gray-700 active-time"
-                : "bg-slate-50 dark:bg-gray-600"
+                ? "border-2 border-emerald-400 bg-white"
+                : "border-2 border-gray-200 bg-gray-50 hover:border-violet-300"
             }`}
           >
             {time.icon}
-            <p
-              className={`text-base font-bold ${
-                isActiveTime(time.amount) ? "text-blue-600" : ""
+            <span
+              className={`text-sm font-bold sm:text-base ${
+                isActiveTime(time.amount) ? "text-violet-500" : "text-gray-700"
               }`}
             >
               {time.label}
-            </p>
-            <p
-              className={`text-sm ${
-                isActiveTime(time.amount)
-                  ? "text-blue-500"
-                  : "text-gray-600 dark:text-gray-300"
-              }`}
-            >
-              {time.amount}
-            </p>
+            </span>
             {isActiveTime(time.amount) && (
-              <div className="absolute flex items-center justify-center w-5 h-5 border border-blue-500 rounded-full top-1 right-1">
+              <div className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full border border-emerald-300 bg-white text-[8px] text-emerald-400">
                 <FontAwesomeIcon
                   icon={faCheck}
-                  className="text-xs text-blue-500"
+                  className="text-[8px] text-emerald-400"
                 />
               </div>
             )}
-          </div>
+          </button>
         ))}
       </div>
     </div>

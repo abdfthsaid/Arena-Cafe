@@ -3,9 +3,11 @@ import HeaderSection from "./components/HeaderSection ";
 import TimeOptions from "./components/TimeOptions";
 import PaymentSection from "./components/PaymentSection";
 
+const DEFAULT_AMOUNT = 0.75;
+
 const WiFiPayment = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState("$0.50");
+  const [selectedAmount, setSelectedAmount] = useState(DEFAULT_AMOUNT);
   const [selectedMethod, setSelectedMethod] = useState("EVC Plus");
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
@@ -14,11 +16,29 @@ const WiFiPayment = () => {
 
   return (
     <div
-      className={`${darkMode ? "dark" : ""} min-h-screen bg-[radial-gradient(circle_at_top,#f3f0ff,#f7fbff_42%,#eefbf5)] px-4 py-6 transition-colors duration-500 dark:bg-[#0f172a]`}
+      className={`${darkMode ? "dark" : ""} relative min-h-screen overflow-hidden px-3 py-6 transition-colors sm:px-4 sm:py-12 ${
+        darkMode
+          ? "bg-gradient-to-b from-[#1a1333] via-[#1e1b2e] to-[#151520]"
+          : "bg-gray-100"
+      }`}
     >
-      <div className="max-w-sm mx-auto p-5 overflow-hidden rounded-[2rem] border border-white/80 shadow-2xl bg-white/95 text-gray-800 backdrop-blur dark:border-slate-700 dark:bg-[#111827] dark:text-white">
+      {darkMode && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-32 -top-20 h-[420px] w-[420px] rounded-full bg-violet-600/20 blur-[100px]" />
+          <div className="absolute -right-24 top-[40%] h-[300px] w-[300px] rounded-full bg-emerald-500/12 blur-[90px]" />
+          <div className="absolute -bottom-16 left-[20%] h-[260px] w-[260px] rounded-full bg-indigo-500/15 blur-[80px]" />
+        </div>
+      )}
+
+      <main
+        className={`relative mx-auto w-full max-w-md rounded-3xl border p-4 shadow-lg sm:p-5 ${
+          darkMode
+            ? "border-white/[0.08] bg-white/[0.06] text-white shadow-2xl shadow-violet-500/10 backdrop-blur-xl"
+            : "border-gray-200 bg-white text-slate-800"
+        }`}
+      >
         <HeaderSection darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        <div className="overflow-hidden bg-white border border-slate-100 rounded-[1.5rem] shadow-sm dark:border-slate-700 dark:bg-gray-800">
+        <section className="rounded-3xl pb-6">
           <TimeOptions
             selectedAmount={selectedAmount}
             selectTime={selectTime}
@@ -29,14 +49,18 @@ const WiFiPayment = () => {
             selectMethod={selectMethod}
             darkMode={darkMode}
           />
-        </div>
-        <footer className="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
-          Arena Cafe support{" "}
+        </section>
+        <footer
+          className={`mt-6 px-4 py-3 text-center text-xs sm:text-sm ${
+            darkMode ? "text-gray-400" : "text-gray-600"
+          }`}
+        >
+          Call us any feedback or problem{" "}
           <span className="font-semibold text-gray-800 dark:text-white">
             616586503 / 616251068
           </span>
         </footer>
-      </div>
+      </main>
     </div>
   );
 };
