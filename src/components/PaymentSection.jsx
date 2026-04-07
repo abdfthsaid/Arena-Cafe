@@ -3,6 +3,52 @@ import React, { useState } from "react";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import ProcessingModal from "./ProcessingModal";
 
+const BACKEND_URL =
+  import.meta.env.VITE_USERS_BACKEND_URL ||
+  "https://usersbackend-6yhs.onrender.com";
+const STATION_CODE = import.meta.env.VITE_STATION_CODE || "62";
+
+function getWaafiMessage(data) {
+  return (
+    data?.waafiResponse?.responseMsg ||
+    data?.waafiMsg ||
+    data?.waafiMessage ||
+    ""
+  );
+}
+
+function mapBackendErrorMessage(errorMsg, waafiMsg) {
+  if (waafiMsg) {
+    return waafiMsg;
+  }
+
+  if (errorMsg.includes("No available battery")) {
+    return "Ma jiro baytari diyaar ah hadda, fadlan mar kale isku day";
+  }
+
+  if (errorMsg.includes("already have an active rental")) {
+    return "Waxaad hore u haysataa battery, fadlan soo celi midkaas ka hor intaadan mid kale kireysanin";
+  }
+
+  if (errorMsg.includes("battery is already rented")) {
+    return "Battery-gan waa la kireystay, fadlan mar kale isku day";
+  }
+
+  if (errorMsg.includes("blocked") || errorMsg.includes("blacklist")) {
+    return "Macamiil waxa kugu maqan battery hore fadlan soo celi midkaas";
+  }
+
+  if (errorMsg.includes("Payment hold not approved")) {
+    return "Lacag bixinta ma dhicin, fadlan hubi numberkaaga iyo haraagaaga";
+  }
+
+  if (errorMsg.includes("Battery could not be released. Payment hold was cancelled.")) {
+    return "Battery-gu ma soo bixin. Hold-kii lacagta waa la cancel gareeyay.";
+  }
+
+  return errorMsg || "Khalad dhacay, fadlan mar kale isku day";
+}
+
 const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
   const [showProcessing, setShowProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState("processing");
@@ -21,7 +67,6 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
   const handlePayment = async () => {
     // 🛡️ PREVENT DOUBLE-CLICK
     if (isSubmitting) {
-      console.log("⚠️ Payment already in progress, ignoring click");
       return;
     }
     setIsSubmitting(true);
@@ -33,7 +78,7 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
       // Step 1: Check blacklist
       setStatusMessage("Hubinaya macluumaadka..."); // Checking information
       const blacklistCheck = await axios.get(
-        `https://usersbackend-nxjy.onrender.com/api/blacklist/check/${number}`,
+        `${BACKEND_URL}/api/blacklist/check/${number}`,
         { validateStatus: () => true },
       );
 
@@ -48,12 +93,13 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
       }
 
       // Step 2: Process payment
-      setStatusMessage("Diraya lacagta... Fadlan sug"); // Sending payment... Please wait
+      setStatusMessage("Hold lacagta, furaya battery-ga... Fadlan sug");
       const res = await axios.post(
-        "https://usersbackend-nxjy.onrender.com/api/pay/05",
+        `${BACKEND_URL}/api/pay/${STATION_CODE}`,
         {
           phoneNumber: number,
           amount: amount,
+          stationCode: STATION_CODE,
         },
         {
           validateStatus: () => true, // Prevent axios from throwing error on 400/500
@@ -61,53 +107,41 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
       );
 
       const data = res.data;
+      const waafiMsg = getWaafiMessage(data);
 
       if (res.status === 200 && data.success === true) {
         setProcessingStatus("success");
         setBatteryInfo({ battery_id: data.battery_id, slot_id: data.slot_id });
-        setWaafiMessage(data.waafiMessage || "Lacag bixinta waa guulaysatay!"); // Payment successful!
+        setWaafiMessage(waafiMsg || "Lacag bixinta waa guulaysatay!"); // Payment successful!
         setStatusMessage("");
         isSuccess = true;
       } else if (data.error) {
         // Handle backend error messages
         setProcessingStatus("failed");
         const errorMsg = data.error;
+        setErrorMessage(mapBackendErrorMessage(errorMsg, waafiMsg));
 
         // Detect specific error types from message
         if (errorMsg.includes("No available battery")) {
           setReason("NO_BATTERY_AVAILABLE");
-          setErrorMessage(
-            "Ma jiro baytari diyaar ah hadda, fadlan mar kale isku day",
-          );
         } else if (errorMsg.includes("already have an active rental")) {
           setReason("ALREADY_RENTED");
-          setErrorMessage(
-            "Waxaad hore u haysataa battery, fadlan soo celi midkaas ka hor intaadan mid kale kireysanin",
-          );
         } else if (errorMsg.includes("battery is already rented")) {
           setReason("BATTERY_TAKEN");
-          setErrorMessage(
-            "Battery-gan waa la kireystay, fadlan mar kale isku day",
-          );
         } else if (errorMsg.includes("blocked from renting")) {
           setReason("BLACKLISTED");
-          setErrorMessage(
-            "Waa lagaa mamnuucay kireysiga. Fadlan la xiriir taageerada.",
-          );
-        } else if (errorMsg.includes("Payment not approved")) {
+        } else if (
+          errorMsg.includes("Payment not approved") ||
+          errorMsg.includes("Payment hold not approved")
+        ) {
           setReason("PAYMENT_FAILED");
-          setErrorMessage("Lacag bixinta ma dhicin, fadlan hubi numberkaaga");
         } else if (
           errorMsg.includes("blocked") ||
           errorMsg.includes("blacklist")
         ) {
           setReason("BLACKLISTED");
-          setErrorMessage(
-            "Macamiil waxa kugu maqan battery hore fadlan soo celi midkaas",
-          );
         } else {
           setReason("PAYMENT_FAILED");
-          setErrorMessage(errorMsg);
         }
       } else {
         // Fallback for other error cases
@@ -119,7 +153,7 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
       if (!isSuccess) {
         setIsSubmitting(false);
       }
-    } catch (err) {
+    } catch {
       // Catch block will rarely be triggered now unless there is a network failure
       setProcessingStatus("failed");
       setReason("network_error");
@@ -193,11 +227,11 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
       )}
 
       {/* Amount to Pay */}
-      <div className="py-4 mt-6 ml-3 mr-3 text-center bg-purple-200 shadow rounded-xl dark:bg-purple-800">
-        <p className="text-lg font-semibold text-purple-800 dark:text-purple-200">
+      <div className="py-4 mt-6 ml-3 mr-3 text-center border shadow rounded-xl border-blue-100 bg-blue-50 dark:border-blue-900/60 dark:bg-blue-950/40">
+        <p className="text-lg font-semibold text-blue-800 dark:text-blue-200">
           Amount to Pay:
         </p>
-        <p className="text-3xl font-extrabold text-purple-900 dark:text-white">
+        <p className="text-3xl font-extrabold text-slate-950 dark:text-white">
           {selectedAmount}
         </p>
       </div>
@@ -207,14 +241,14 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
         <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
           Habka Lacag Bixinta
         </p>
-        <div className="grid grid-cols-4 gap-2 text-xs font-medium text-center">
+        <div className="grid grid-cols-3 gap-2 text-xs font-medium text-center">
           {["EVC Plus", "ZAAD", "SAHAL"].map((method) => (
             <button
               key={method}
               onClick={() => selectMethod(method)}
               className={`px-2 py-1 rounded-full shadow-sm border ${
                 isActiveMethod(method)
-                  ? "bg-pink-100 text-pink-800 border-pink-400 active-method dark:bg-pink-700 dark:text-pink-200 dark:border-pink-600"
+                  ? "bg-blue-100 text-blue-800 border-blue-400 active-method dark:bg-blue-800 dark:text-blue-100 dark:border-blue-600"
                   : "bg-gray-100 dark:bg-gray-700 dark:text-gray-300 border-transparent"
               }`}
             >
@@ -266,15 +300,15 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
           onClick={() => setAgree1(!agree1)}
           className={`flex items-center gap-3 p-3 transition-all duration-200 border-2 cursor-pointer rounded-xl ${
             agree1
-              ? "border-pink-400 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 dark:border-pink-500"
-              : "border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-600 hover:border-pink-200 dark:hover:border-pink-700"
+              ? "border-blue-400 bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-blue-900/20 dark:to-emerald-900/20 dark:border-blue-500"
+              : "border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-600 hover:border-blue-200 dark:hover:border-blue-700"
           } ${errors.agree1 ? "border-red-400 dark:border-red-500" : ""}`}
         >
           {/* Custom Checkbox */}
           <div
             className={`flex items-center justify-center w-6 h-6 rounded-md border-2 transition-all duration-200 flex-shrink-0 ${
               agree1
-                ? "bg-gradient-to-r from-pink-500 to-purple-500 border-pink-500"
+                ? "bg-gradient-to-r from-blue-600 to-emerald-400 border-blue-500"
                 : "border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700"
             }`}
           >
@@ -305,7 +339,7 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="text-xs font-medium text-pink-500 underline transition hover:text-pink-600 dark:text-pink-400 dark:hover:text-pink-300 decoration-dotted underline-offset-2"
+              className="text-xs font-medium text-blue-600 underline transition hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-200 decoration-dotted underline-offset-2"
             >
               📜 Shuruudaha iyo xeerarka isticmaalka Danab
             </a>
@@ -335,7 +369,7 @@ const PaymentSection = ({ selectedAmount, selectedMethod, selectMethod }) => {
       <div className="ml-3 mr-3">
         <button
           onClick={handlePay}
-          className="flex items-center justify-center w-full gap-2 py-3 mt-5 text-lg font-bold text-white transition shadow-lg bg-gradient-to-r from-pink-500 to-indigo-500 rounded-xl hover:scale-105"
+          className="flex items-center justify-center w-full gap-2 py-3 mt-5 text-lg font-bold text-white transition shadow-lg bg-gradient-to-r from-blue-600 to-emerald-400 rounded-xl hover:scale-105"
         >
           Bixi Hadda
           <FaLongArrowAltRight className="w-6 h-6" />

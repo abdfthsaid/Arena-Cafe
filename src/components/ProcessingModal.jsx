@@ -75,7 +75,7 @@ const ProcessingModal = ({
   const renderProcessingContent = () => (
     <>
       <h2 className="mb-2 text-xl font-semibold text-gray-800">
-        Processing Payment
+        Lacag bixinta
       </h2>
       {statusMessage && (
         <p className="mb-4 text-sm font-medium text-purple-600">
@@ -83,7 +83,7 @@ const ProcessingModal = ({
         </p>
       )}
       <p className="mb-6 text-sm text-gray-400">
-        Fadlan sug inta aan lacagta ku dirno...
+        Waafi hold, battery unlock, kadib commit ayaa socda...
       </p>
       <div className="flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-purple-500 rounded-full animate-spin border-t-transparent">

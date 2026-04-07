@@ -1,5 +1,5 @@
 import React from "react";
-import { BsArchive } from "react-icons/bs";
+import { BsLightningChargeFill } from "react-icons/bs";
 import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -9,7 +9,7 @@ const HeaderSection = ({ darkMode, toggleDarkMode }) => (
     <div className="flex items-center justify-between mb-4">
       <div className="flex justify-center flex-1">
         <div className="flex items-center justify-center w-16 h-16 bg-pink-100 rounded-full shadow dark:bg-gray-800">
-          <BsArchive className="w-10 h-10 text-pink-500 dark:text-purple-300" />
+          <BsLightningChargeFill className="w-10 h-10 text-blue-600 dark:text-sky-300" />
         </div>
       </div>
 

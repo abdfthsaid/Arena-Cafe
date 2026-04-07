@@ -1,14 +1,22 @@
-# React + Vite
+# Arena Cafe Station Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Temporary single-station React/Vite frontend for testing Arena Cafe Mogadishu
+against the current Render `UsersBackend`.
 
-Currently, two official plugins are available:
+- Station code: `62`
+- Backend: `https://usersbackend-6yhs.onrender.com`
+- Flow: Waafi preauthorization, HeyCharge unlock, Waafi commit/cancel
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Optional environment variables:
 
-## Expanding the ESLint configuration
+```bash
+VITE_USERS_BACKEND_URL=https://usersbackend-6yhs.onrender.com
+VITE_STATION_CODE=62
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# danab1
-# boondheeere_dbn
+Run locally:
+
+```bash
+npm install
+npm run dev
+```
